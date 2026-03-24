@@ -19,11 +19,10 @@ def main(argv=None):
     app_name = "cbom4cert"
     parser = argparse.ArgumentParser(
         prog=app_name,
-        description=textwrap.dedent(
-            """
-            CBOM4cert generates a Cryptography Bill of Materials for one or more installed certificates.
-            """
-        ),
+        description=textwrap.dedent("""
+            CBOM4cert generates a Cryptography Bill of Materials for one or
+            more installed certificates.
+            """),
     )
     input_group = parser.add_argument_group("Input")
     support_certfile = platform.system() not in ["Windows", "Darwin"]
@@ -106,8 +105,8 @@ def main(argv=None):
             bom_format = "json"
 
     # At least certificate or system shgould be specified
-    if certificate_name == "" and not args['system']:
-        print ("[ERROR] One of --certificate or --system must be specified")
+    if certificate_name == "" and not args["system"]:
+        print("[ERROR] One of --certificate or --system must be specified")
 
     if args["debug"]:
         if support_certfile:
@@ -121,15 +120,20 @@ def main(argv=None):
     cbom_generator = CBOMGenerator()
 
     if support_certfile and len(certificate_name) > 0:
-        # Chcek file exists
-        cbom_generator.process_certificate(certificate_name)
+        if cbom_generator.check_file(certificate_name):
+            cbom_generator.process_certificate(certificate_name)
+        else:
+            print(f"[ERROR] {certificate_name} not found")
+            return -1
     elif args["system"]:
         cbom_generator.get_system_certificates(args["path"])
     else:
         print("[ERROR] Nothing to process")
         return -1
 
-    cbom_generator.create_cbom(sbom_type = args["sbom"], sbom_format=args["format"], outfile = args["output_file"])
+    cbom_generator.create_cbom(
+        sbom_type=args["sbom"], sbom_format=args["format"], outfile=args["output_file"]
+    )
 
     return 0
 
