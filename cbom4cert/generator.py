@@ -8,6 +8,8 @@ import subprocess  # nosec
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
+import warnings
+from cryptography.utils import CryptographyDeprecationWarning
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -51,6 +53,7 @@ class CBOMGenerator:
         return file_exists
 
     def get_cert_metadata(self, cert_bytes, fmt="DER", cert_file=None):
+        warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
         if fmt == "PEM":
             cert = x509.load_pem_x509_certificate(cert_bytes, default_backend())
         else:
